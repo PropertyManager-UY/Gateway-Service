@@ -34,12 +34,10 @@ jobs:
         docker push $DOCKER_USERNAME/property_manager.$SERVICE_NAME:$DOCKER_IMAGE_TAG
 
     - name: Set up Minikube
-      uses: medyagh/setup-minikube@latest
+      uses: medyagh/setup-minikube@master
       with:
         minikube-version: 'v1.32.0'
         kubernetes-version: 'v1.28.3'
-        cpus: 6
-        memory: 16384
 
     - name: Use kubeconfig from secret
       run: |
