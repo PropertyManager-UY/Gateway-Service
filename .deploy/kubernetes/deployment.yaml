@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: $SERVICE
-          image: $USERNAME/$SERVICE:$IMAGETAG
+          image: $USERNAME/property_manager.$SERVICE:$IMAGETAG
           ports:
             - containerPort: 5000

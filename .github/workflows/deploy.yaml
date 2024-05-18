@@ -30,8 +30,8 @@ jobs:
 
     - name: Build and Push Docker Image
       run: |
-        docker build -t $DOCKER_USERNAME/$SERVICE_NAME:$DOCKER_IMAGE_TAG .
-        docker push $DOCKER_USERNAME/$SERVICE_NAME:$DOCKER_IMAGE_TAG
+        docker build -t $DOCKER_USERNAME/property_manager.$SERVICE_NAME:$DOCKER_IMAGE_TAG .
+        docker push $DOCKER_USERNAME/property_manager.$SERVICE_NAME:$DOCKER_IMAGE_TAG
 
     - name: Set up kubectl
       uses: azure/k8s-set-context@v1
@@ -41,7 +41,7 @@ jobs:
 
     - name: Update Kubernetes Deployment
       run: |
-        kubectl set image deployment/$K8_DEPLOYMENT $K8_APP=$DOCKER_USERNAME/$SERVICE_NAME:$DOCKER_IMAGE_TAG --namespace ${{ env.K8_NAMESPACE }}
+        kubectl set image deployment/$K8_DEPLOYMENT $K8_APP=$DOCKER_USERNAME/property_manager.$SERVICE_NAME:$DOCKER_IMAGE_TAG --namespace ${{ env.K8_NAMESPACE }}
 
     - name: Apply Kubernetes Resources
       run: |
