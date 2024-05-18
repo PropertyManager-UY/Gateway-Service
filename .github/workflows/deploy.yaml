@@ -34,7 +34,7 @@ jobs:
         docker push $DOCKER_USERNAME/property_manager.$SERVICE_NAME:$DOCKER_IMAGE_TAG
 
     - name: Set up Minikube
-      uses: medyagh/setup-minikube@master
+      uses: medyagh/setup-minikube@v0.0.16
       with:
         minikube-version: 'v1.32.0'
         kubernetes-version: 'v1.28.3'
