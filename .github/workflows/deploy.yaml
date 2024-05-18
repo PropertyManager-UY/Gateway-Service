@@ -34,9 +34,8 @@ jobs:
         docker push $DOCKER_USERNAME/property_manager.$SERVICE_NAME:$DOCKER_IMAGE_TAG
 
     - name: Set up kubectl
-      uses: azure/k8s-set-context@v1
+      uses: medyagh/setup-minikube@master
       with:
-        method: kubeconfig
         kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
     - name: Update Kubernetes Deployment
