@@ -1,0 +1,48 @@
+name: Continuous Deployment
+
+on:
+  workflow_run:
+    workflows: ["Run Tests"]  # Nombre del flujo de trabajo que debe completarse
+    types:
+      - completed
+
+jobs:
+  build-and-deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}  # Solo ejecutar si las pruebas fueron exitosas
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_IMAGE_TAG: "latest"
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      K8_NAMESPACE: "property-manager"
+      K8_DEPLOYMENT: "gateway-deployment"
+      HPA_NAME: "gateway-hpa"
+      SERVICE_NAME: "gateway-service"
+      K8_APP: "gateway"
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t $DOCKER_USERNAME/$SERVICE_NAME:$DOCKER_IMAGE_TAG .
+        docker push $DOCKER_USERNAME/$SERVICE_NAME:$DOCKER_IMAGE_TAG
+
+    - name: Set up kubectl
+      uses: azure/k8s-set-context@v1
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+    - name: Update Kubernetes Deployment
+      run: |
+        kubectl set image deployment/$K8_DEPLOYMENT $K8_APP=$DOCKER_USERNAME/$SERVICE_NAME:$DOCKER_IMAGE_TAG --namespace ${{ env.K8_NAMESPACE }}
+
+    - name: Apply Kubernetes Resources
+      run: |
+        kubectl apply -f .deploy/kubernetes --namespace $K8_NAMESPACE --username $DOCKER_USERNAME --imagetag $DOCKER_IMAGE_TAG --app $K8_APP --service $SERVICE_NAME --hpa $HPA_NAME --deployment $K8_DEPLOYMENT
