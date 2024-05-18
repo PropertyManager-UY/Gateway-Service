@@ -35,9 +35,6 @@ jobs:
 
     - name: Set up Minikube
       uses: medyagh/setup-minikube@v0.0.16
-      with:
-        minikube-version: 'v1.32.0'
-        kubernetes-version: 'v1.28.3'
 
     - name: Use kubeconfig from secret
       run: |
