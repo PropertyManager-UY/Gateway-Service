@@ -17,39 +17,38 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       K8_NAMESPACE: "property-manager"
       K8_DEPLOYMENT: "gateway-deployment"
-      HPA_NAME: "gateway-hpa"
       SERVICE_NAME: "gateway-service"
       K8_APP: "gateway"
+      SERVER_KUBE_CONFIG: ${{ secrets.SERVER_KUBE_CONFIG }}
+      DEPLOYMENT_DIR: ${{ secrets.DEPLOYMENT_DIR }}
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
     - name: Login to Docker Hub
-      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
     - name: Build and Push Docker Image
       run: |
         docker build -t $DOCKER_USERNAME/property_manager.$SERVICE_NAME:$DOCKER_IMAGE_TAG .
         docker push $DOCKER_USERNAME/property_manager.$SERVICE_NAME:$DOCKER_IMAGE_TAG
 
-    - name: Set up Minikube
-      uses: medyagh/setup-minikube@v0.0.16
+    - name: Set up SSH for remote server access
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Use kubeconfig from secret
+    - name: Copy Kubernetes manifests to server
       run: |
-        mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
-        export KUBECONFIG=$HOME/.kube/config
-
-    - name: Ensure namespace exists
-      run: |
-        kubectl create namespace $K8_NAMESPACE || true
+        scp -r .deploy/kubernetes ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOYMENT_DIR }}/deployment-$K8_APP
 
     - name: Update Kubernetes Deployment
       run: |
-        kubectl set image deployment/$K8_DEPLOYMENT $K8_APP=$DOCKER_USERNAME/property_manager.$SERVICE_NAME:$DOCKER_IMAGE_TAG --namespace $K8_NAMESPACE
-
-    - name: Apply Kubernetes Resources
-      run: |
-        kubectl apply -f .deploy/kubernetes --namespace $K8_NAMESPACE --username $DOCKER_USERNAME --imagetag $DOCKER_IMAGE_TAG --app $K8_APP --service $SERVICE_NAME --hpa $HPA_NAME --deployment $K8_DEPLOYMENT
+        ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} << EOF
+          export KUBECONFIG=${{ secrets.SERVER_KUBE_CONFIG }}
+          kubectl create namespace $K8_NAMESPACE || true
+          kubectl set image deployment/$K8_DEPLOYMENT $K8_APP=$DOCKER_USERNAME/property_manager.$SERVICE_NAME:$DOCKER_IMAGE_TAG --namespace $K8_NAMESPACE
+          kubectl apply -f ${{ secrets.DEPLOYMENT_DIR }}/deployment-$K8_APP --namespace $K8_NAMESPACE
+          rm -rf ${{ secrets.DEPLOYMENT_DIR }}/deployment-$K8_APP
+        EOF
