@@ -50,7 +50,7 @@ jobs:
 
     - name: Copy Kubernetes manifests to server
       run: |
-        scp -r .deploy/kubernetes ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOYMENT_DIR }}/deployment-${K8_APP}
+        scp -r .deploy/kubernetes/* ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOYMENT_DIR }}/deployment-${K8_APP}
 
     - name: List files in deployment directory
       run: |
