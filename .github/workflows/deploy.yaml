@@ -26,6 +26,9 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
+    - name: Create SSH directory
+      run: mkdir -p ~/.ssh && chmod 700 ~/.ssh
+
     - name: Check and add host key to known_hosts
       run: ssh-keyscan -H 109.199.116.12 >> ~/.ssh/known_hosts
 
