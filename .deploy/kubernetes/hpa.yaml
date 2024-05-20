@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: $HPA
-  namespace: $NAMESPACE
+  name: ${HPA_NAME}
+  namespace: ${K8_NAMESPACE}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: $DEPLOYMENT  # Nombre del deployment que deseas escalar
+    name: ${K8_DEPLOYMENT}  # Nombre del deployment que deseas escalar
   minReplicas: 1  # Número mínimo de réplicas
   maxReplicas: 5  # Número máximo de réplicas
   metrics:

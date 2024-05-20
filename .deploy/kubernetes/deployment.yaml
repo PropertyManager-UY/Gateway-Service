@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: $DEPLOYMENT
-  namespace: $NAMESPACE
+  name: ${K8_DEPLOYMENT}
+  namespace: ${K8_NAMESPACE}
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: $APP
+      app: ${K8_APP}
   template:
     metadata:
       labels:
-        app: $APP
+        app: ${K8_APP}
     spec:
       containers:
-        - name: $SERVICE
-          image: $USERNAME/property_manager.$SERVICE:$IMAGETAG
+        - name: ${SERVICE_NAME}
+          image: ${DOCKER_USERNAME}/property_manager.${SERVICE_NAME}:${DOCKER_IMAGE_TAG}
           ports:
             - containerPort: 5000
