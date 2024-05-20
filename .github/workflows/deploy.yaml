@@ -2,7 +2,7 @@ name: Continuous Deployment
 
 on:
   workflow_run:
-    workflows: ["Run Tests"]  # Nombre del flujo de trabajo que debe completarse
+    workflows: ["Run Tests and Deploy"]  # Nombre del flujo de trabajo que debe completarse
     types:
       - completed
 
