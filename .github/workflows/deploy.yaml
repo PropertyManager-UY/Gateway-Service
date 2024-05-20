@@ -50,7 +50,13 @@ jobs:
 
     - name: Copy Kubernetes manifests to server
       run: |
-        scp -r .deploy/kubernetes ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOYMENT_DIR }}/deployment-$K8_APP
+        scp -r .deploy/kubernetes ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOYMENT_DIR }}/deployment-${K8_APP}
+
+    - name: List files in deployment directory
+      run: |
+        ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} << EOF
+          ls ${{ secrets.DEPLOYMENT_DIR }}/deployment-${K8_APP}
+        EOF
 
     - name: Update Kubernetes Deployment
       run: |
@@ -58,5 +64,5 @@ jobs:
           export KUBECONFIG=${{ secrets.SERVER_KUBE_CONFIG }}
           kubectl apply -f ${{ secrets.DEPLOYMENT_DIR }}/deployment-$K8_APP --namespace $K8_NAMESPACE || kubectl create namespace $K8_NAMESPACE
           kubectl set image deployment/$K8_DEPLOYMENT $K8_APP=$DOCKER_USERNAME/property_manager.$SERVICE_NAME:$DOCKER_IMAGE_TAG --namespace $K8_NAMESPACE
-          rm -rf ${{ secrets.DEPLOYMENT_DIR }}/deployment-$K8_APP
+          rm -rf ${{ secrets.DEPLOYMENT_DIR }}/deployment-${K8_APP}
         EOF
