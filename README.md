@@ -45,4 +45,3 @@ Si deseas contribuir a este proyecto, sigue estos pasos:
 5. Crea un nuevo pull request en GitHub.
 
 Esperamos tus contribuciones!
-
