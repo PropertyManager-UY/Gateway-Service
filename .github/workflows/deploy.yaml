@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      K8_APP: "auth"
+      K8_APP: "gateway"
 
     steps:
       - name: Checkout Repository
