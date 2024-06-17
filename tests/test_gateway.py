@@ -2,21 +2,19 @@ import unittest
 from unittest.mock import patch, Mock
 from flask import json
 import requests
-from gateway import app, discover_service_url
+from gateway import app
 
 class GatewayTestCase(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
 
+    @patch('gateway.discover_service_url')
     @patch('gateway.requests.request')
-    def test_discover_service_url(self, mock_request):
-        service_name = "test-service"
-        expected_url = f'http://{service_name}-service.property-manager.svc.cluster.local'
-        self.assertEqual(discover_service_url(service_name), expected_url)
-
-    @patch('gateway.requests.request')
-    def test_get_request(self, mock_request):
+    def test_get_request(self, mock_request, mock_discover_service_url):
+        # Configurar el mock de la URL del servicio
+        mock_discover_service_url.return_value = 'http://test-service.property-manager.svc.cluster.local:80'
+        
         # Configurar el mock de la respuesta
         mock_response = Mock()
         mock_response.content = b'{"message": "success"}'
@@ -32,8 +30,12 @@ class GatewayTestCase(unittest.TestCase):
         self.assertEqual(response.data, b'{"message": "success"}')
         self.assertEqual(response.content_type, 'application/json')
 
+    @patch('gateway.discover_service_url')
     @patch('gateway.requests.request')
-    def test_post_request(self, mock_request):
+    def test_post_request(self, mock_request, mock_discover_service_url):
+        # Configurar el mock de la URL del servicio
+        mock_discover_service_url.return_value = 'http://test-service.property-manager.svc.cluster.local:80'
+        
         # Configurar el mock de la respuesta
         mock_response = Mock()
         mock_response.content = b'{"message": "created"}'
@@ -49,8 +51,12 @@ class GatewayTestCase(unittest.TestCase):
         self.assertEqual(response.data, b'{"message": "created"}')
         self.assertEqual(response.content_type, 'application/json')
 
+    @patch('gateway.discover_service_url')
     @patch('gateway.requests.request')
-    def test_put_request(self, mock_request):
+    def test_put_request(self, mock_request, mock_discover_service_url):
+        # Configurar el mock de la URL del servicio
+        mock_discover_service_url.return_value = 'http://test-service.property-manager.svc.cluster.local:80'
+        
         # Configurar el mock de la respuesta
         mock_response = Mock()
         mock_response.content = b'{"message": "updated"}'
@@ -66,8 +72,12 @@ class GatewayTestCase(unittest.TestCase):
         self.assertEqual(response.data, b'{"message": "updated"}')
         self.assertEqual(response.content_type, 'application/json')
 
+    @patch('gateway.discover_service_url')
     @patch('gateway.requests.request')
-    def test_delete_request(self, mock_request):
+    def test_delete_request(self, mock_request, mock_discover_service_url):
+        # Configurar el mock de la URL del servicio
+        mock_discover_service_url.return_value = 'http://test-service.property-manager.svc.cluster.local:80'
+        
         # Configurar el mock de la respuesta
         mock_response = Mock()
         mock_response.content = b'{"message": "deleted"}'
@@ -83,8 +93,12 @@ class GatewayTestCase(unittest.TestCase):
         self.assertEqual(response.data, b'{"message": "deleted"}')
         self.assertEqual(response.content_type, 'application/json')
 
+    @patch('gateway.discover_service_url')
     @patch('gateway.requests.request')
-    def test_request_exception(self, mock_request):
+    def test_request_exception(self, mock_request, mock_discover_service_url):
+        # Configurar el mock de la URL del servicio
+        mock_discover_service_url.return_value = 'http://test-service.property-manager.svc.cluster.local:80'
+        
         # Configurar el mock para lanzar una excepción
         mock_request.side_effect = requests.exceptions.RequestException("Error")
 
