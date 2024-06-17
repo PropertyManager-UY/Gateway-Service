@@ -4,10 +4,11 @@ metadata:
   name: ${SERVICE_NAME}
   namespace: ${K8_NAMESPACE}
 spec:
+  type: NodePort
   selector:
     app: ${K8_APP}
   ports:
     - protocol: TCP
       port: 80
       targetPort: 5000
-  type: NodePort
+      nodePort: 32000
