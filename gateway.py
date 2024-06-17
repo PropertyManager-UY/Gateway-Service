@@ -9,7 +9,12 @@ app = Flask(__name__)
 def is_running_in_kubernetes():
     return os.path.exists('/var/run/secrets/kubernetes.io/serviceaccount/token')
 
-if is_running_in_kubernetes():
+def is_test_env():
+    return os.getenv('TEST_ENV', 'false').lower() == 'true'
+
+if is_test_env():
+    print("Running in test environment, skipping Kubernetes config loading.")
+elif is_running_in_kubernetes():
     config.load_incluster_config()  # Usar esta línea si la aplicación corre dentro de un pod
 else:
     config.load_kube_config()  # Usar esta línea si corres la aplicación localmente con kubeconfig
