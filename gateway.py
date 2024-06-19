@@ -9,40 +9,17 @@ app = Flask(__name__)
 def is_running_in_kubernetes():
     return os.path.exists('/var/run/secrets/kubernetes.io/serviceaccount/token')
 
-def get_kubernetes_api_url():
-    return 'https://kubernetes.default.svc'
-
-def get_kubernetes_token():
-    with open('/var/run/secrets/kubernetes.io/serviceaccount/token', 'r') as token_file:
-        return token_file.read()
-
-def get_kubernetes_ca_cert():
-    return '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
-
 def get_local_hostnames():
     with open('/etc/hosts', 'r') as f:
         return [line.split()[1] for line in f if line.strip().endswith('.local')]
 
 def discover_service_url(service_name):
     if is_running_in_kubernetes():
-        api_url = get_kubernetes_api_url()
-        token = get_kubernetes_token()
-        namespace = 'property-manager'
-        headers = {'Authorization': f'Bearer {token}'}
-        ca_cert = get_kubernetes_ca_cert()
-
         try:
-            response = requests.get(
-                f'{api_url}/api/v1/namespaces/{namespace}/services/{service_name}-service',
-                headers=headers,
-                verify=ca_cert
-            )
-            response.raise_for_status()
-            service = response.json()
-            port = service['spec']['ports'][0]['port']
-            return f'http://{service_name}-service.{namespace}.svc.cluster.local:{port}'
-        except requests.exceptions.RequestException as e:
-            print(f"Error al obtener el servicio: {e}")
+            socket.gethostbyname(f'{service_name}-service')
+            return f'http://{service_name}-service.property-manager.svc.cluster.local'
+        except socket.gaierror:
+            pass
     else:
         local_hostnames = get_local_hostnames()
         for hostname in local_hostnames:
