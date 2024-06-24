@@ -32,6 +32,7 @@ def discover_service_url(service_name):
                     pass
     return None
 
+@app.route('/<service>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @app.route('/<service>/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def gateway(service, path=''):
     service_url = discover_service_url(service)
