@@ -2,8 +2,12 @@ import socket
 from flask import Flask, request, jsonify
 import requests
 import os
+from flask_cors import CORS  # Importa CORS
 
 app = Flask(__name__)
+
+# Configura CORS para permitir solicitudes desde cualquier origen
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Determinar si estamos dentro de un pod de Kubernetes
 def is_running_in_kubernetes():
