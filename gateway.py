@@ -7,7 +7,7 @@ from flask_cors import CORS  # Importa CORS
 app = Flask(__name__)
 
 # Configura CORS para permitir solicitudes desde cualquier origen
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 # Determinar si estamos dentro de un pod de Kubernetes
 def is_running_in_kubernetes():
